@@ -43,6 +43,21 @@ The -d option runs the container in the background and -p 8080:80 maps 8080 from
 
 Docker ps was used to verify the container was running. I opened localhost:8080 to verify that the image built and was running the website correctly.
 
+### Pushing the Image to Dockerhub
+
+Dockerhub reppsitory was reused from previous project. After building and testing the image locally, log into Dockerhub using a Personal Access Token.
+
+```
+docker login -u kan0sh1
+docker push kan0sh1/akuma-fitness:latest
+```
+
+The docker push command uploads the image to DockerHub respository with the latest tag.
+
+Dockerhub was checked to verify the image was uploaded successfully.
+
+[Akuma Fitness DockerHub Repository](https://hub.docker.com/r/kan0sh1/akuma-fitness)
+
 ## 2. Github Actions and Dockerhub
 
 ## 3. Semantic Versioning
