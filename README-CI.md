@@ -60,10 +60,38 @@ Dockerhub was checked to verify the image was uploaded successfully.
 
 ## 2. Github Actions and Dockerhub
 
+### Github Repository Secrets
+
+To allow GitHub Actions to upload Docker Images to DockerHub, two respository secrets were configured.
+
+- DOCKER_USERNAME: stores my DockerHub username.
+
+- DOCKER_TOKEN: stores my DockerHub Personal Access Token.
+
+These are easily added by going to Github repository:
+
+- Choose settings
+- Secrets and Variables
+- Actions 
+- New Repsitory Secret
+
+***It is important to never save a PAT or Password in a repository where anyone else could see this personal information.***
+
 ## 3. Semantic Versioning
 
 ## 4. Testing and Proof
 
+![Docker Container](images/DockerTest.png)
+
+Creating and running the Docker image. This was a test to show that the container was running as intended.
+
+![GitHub Repository Secrets](images/RepoSecrets.png)
+
+This screenshot shows the GitHub Secrets page with my username and token secret added in. The content of those fields is hidden in the screenshot.
+
+
 ## References
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
+
+- [GitHub Docs: Respository Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets)
