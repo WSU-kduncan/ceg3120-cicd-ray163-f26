@@ -107,6 +107,8 @@ Creating and running the Docker image. This was a test to show that the containe
 
 This screenshot shows the GitHub Secrets page with my username and token secret added in. The content of those fields is hidden in the screenshot.
 
+![Main Branch Workflow](images/DockerTest.png)
+
 
 ## References
 
