@@ -115,6 +115,12 @@ Screenshot showing the YAML workflow successfully created a workflow in the gith
 
 To verify that the workflow only ran with main branch, I created a test branch. A small sentence was added to the bottom of the README, it was then commited and pushed to GitHub. I refreshed the page and verified that no new workflow was triggered by this push. This shows that the YAML restriction is built and working as intended.
 
+![Website image test](images/WebsiteWorkflowUpdate.png)
+
+To test if the workflow was publishing website updates, I made a small visible change to the index.html file and pushed the changes to the main branch. The push triggered another action run. After the workflow completed successfully, i pulled the updated docker image using the main tag. 
+
+A new container was started using the updated image and i opened the website in my browser. The changes appeared correctly confirming the updated website files were pushed to Docker Successfully.
+
 ## References
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
