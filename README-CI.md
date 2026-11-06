@@ -77,6 +77,24 @@ These are easily added by going to Github repository:
 
 ***It is important to never save a PAT or Password in a repository where anyone else could see this personal information.***
 
+### GitHub Actions
+
+For this portion of the project, a YAML was created from the official Docker Documentation to create my GitHub Actions workflow. Changes were made to the example document to match my existing DockerHub Repository.
+
+The workflow uses on: push with the main branch specified. This means the workflow will only start when the changes are pushed to main. The pull_request trigger is unecessary for the project but was left in without branches specified in case it becomes necessary at a later time.
+
+The contents: read permission allows the workflow to read the repository contents without giving extra permissions.
+
+Docker/metadata-action@v6 action generates the tags and metadata used for the Docker image. The image name was changed from the example template to match the DockerHub repository. Since the username is saved in a secret file on GitHub I carried that styling over and kept the username secret by using a secret call defined from the documentation. The metadata action uses default tagging rules, generating branch based tags when the workflow runs.
+
+Docker/login-action@v4 action signs into DockerHub using the DOCKER_USERNAME and DOCKER_TOKEN repositoru secrets. By using these secrets the workflow can aunthenticate without putting my credentials directly into the YAML file or having them saved in the public on Github. 
+
+The docker/setup-buildx-action@v4 action sets up Docker Buildx, which is used by Docker to build the container image. 
+
+The docker/build-push-action@v7 action builds the image using the Dockerfile in my repository and uploads it to DockerHub. 
+
+The push: true setting tells the action to upload the image to DockerHub after it has been built. The tags, labels, and annotations will then be supplied by the metadata action also configured in the workflow.
+
 ## 3. Semantic Versioning
 
 ## 4. Testing and Proof
@@ -94,4 +112,10 @@ This screenshot shows the GitHub Secrets page with my username and token secret 
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
 
-- [GitHub Docs: Respository Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets)
+- [GitHub Docs: Respository Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) - Shows how to add repository secrets into the GitHub Repository
+
+- [DockerDocs Github Actions](https://docs.docker.com/build/ci/github-actions/) - Gives a YAML file showing how to set up the CI pipeline.
+
+- [GitHub Workflow Syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax) - Shows how workflows are structured giving a better understanding of what the parts of the YAML were doing and why.
+
+- [Docker Metadata](https://github.com/docker/metadata-action) - Shows how metadata action generates tags. 
