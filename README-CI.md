@@ -2,6 +2,21 @@
 
 ## Project Overview
 
+### Project Goal
+
+The goal of this project is to set up a Continuous Integration (CI) worflow using the GitHub Actions and DockerHub. The workflow will automatically build and publish a Docker Image containing my Akuma Fitness website when the triggering Git event occurs.
+
+The project started by building and uploading Docker Images manually. GitHub Actions were configured to automate this process when changes were pushed to the main branch. In the end the workflow was updated to use semantic versioning so the Docker Image would only be pushed when a versioned tag was pushed.
+
+### Tools Used
+
+- Git: Used to track changes to the site and create versioning tags. 
+- GitHub: Repository storing the website files, Dockerfile, Readme, and GitHub Actions workflow.
+- GitHub Actions: Automates builing and publishing the Docker Image. 
+- Docker: Builds the website image and runs the container for testing. 
+- DockerHub: Stores the published Docker image and the versioned tags.
+- Apache HTTP Server: Runs the website from inside the Docker container.
+
 ### CI Workflow Diagram
 
 ![Worflow Diagram](/images/Diagram.png)
@@ -11,6 +26,7 @@ The diagram shows how website files move from my local repository to DockerHub u
 To achieve this I make changes on my local machine and push them to the GitHub Repository. When I create and pysh a version tag, GitHub actions run the workflow to build and publish the Docker image. 
 
 This image is then stored on DockerHub where it can be pulled and ran in a container. 
+
 ## 1. Docker Website and Container
 
 ### Website Files
@@ -32,11 +48,23 @@ This created three files:
 The Dockerfile is created in the root of the repository to build the website container using Apache HTTP Server.
 
 ```
-FROM http:2.4
-COPY web-content/ /user/local/apache2/htdocs/
+FROM httpd:2.4
+COPY web-content/ /usr/local/apache2/htdocs/
 ```
 
 FROM instruction comes from the official Apache HTTP server image. COPY is used to move the website files into the default directory that Apache uses to serve web content. 
+
+### Building the Docker Image
+
+After creating the Dockerfiel, I built the Docker image from the respository using:
+
+```
+docker build -t kan0sh1/akuma-fitness:latest .
+```
+
+The docker build command uses the Dockerfile to create the image. The -t option assigns a name and a tag to the image, and the . tells Docker to use the current directory for the build context.
+
+
 
 ### Running the Docker Container
 
@@ -88,7 +116,9 @@ These are easily added by going to Github repository:
 
 For this portion of the project, a YAML was created from the official Docker Documentation to create my GitHub Actions workflow. Changes were made to the example document to match my existing DockerHub Repository.
 
-The workflow uses on: push with the main branch specified. This means the workflow will only start when the changes are pushed to main. The pull_request trigger is unecessary for the project but was left in without branches specified in case it becomes necessary at a later time.
+The initial workflow uses on: push with the main branch specified. This means the workflow will only start when the changes are pushed to main. 
+
+The YAML was updated later in the project to only start the workflow when a tagged version was created.
 
 The contents: read permission allows the workflow to read the repository contents without giving extra permissions.
 
@@ -126,7 +156,7 @@ The semver patters from [Dockers Manage Tags and Actions](https://docs.docker.co
 
 The raw latest tag allows the newest release to be identified without specifying a version number. 
 
-So pushing Git tag v1.2.5 would create Docker image tags 1, 1.2.5 and latest. 
+So, for example, pushing Git tag v1.2.5 would create Docker image tags 1, 1.2 and latest. 
 
 ### Docker Image Tags
 
@@ -142,7 +172,7 @@ Creating and running the Docker image. This was a test to show that the containe
 
 This screenshot shows the GitHub Secrets page with my username and token secret added in. The content of those fields is hidden in the screenshot.
 
-![Main Branch Workflow](images/DockerTest.png)
+![Main Branch Workflow](images/MainBranchWorkflow.png)
 
 Screenshot showing the YAML workflow successfully created a workflow in the github actions.
 
@@ -156,21 +186,22 @@ To test if the workflow was publishing website updates, I made a small visible c
 
 A new container was started using the updated image and i opened the website in my browser. The changes appeared correctly confirming the updated website files were pushed to Docker Successfully.
 
-![Docker site with versioning](/images/DockerTag.png)
+![Docker site with versioning](images/DockerTag.png)
 
 This screenshot shows that the updated versioning pushed to dockerhub successfully and generated all 3 expected tags.
 
-![Untagged commit](/images/untaggedcommit.png)
+![Untagged commit](images/untaggedcommit.png)
 
 This screenshot shows that after a successful commit the workflow action did not trigger due to the yaml file
 
-![Version Updates](/images/VersionUpdate.png)
+![Version Updates](images/VersionUpdate.png)
 
 This screenshot shows the versioning update works and now displays v1 as well as v1.1
 
-![Rollback](/images/Rollback.png)
+![Rollback](images/Rollback.png)
 
 This screenshot shows that the image can be pulled from a previous release version. v1.1 and v1.0 were both ran simultaneously on different ports so they could be compared side by side. Docker ps is included under the websites to show the semantic versioning of the images.
+
 ## References
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
