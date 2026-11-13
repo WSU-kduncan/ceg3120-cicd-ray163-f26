@@ -4,6 +4,13 @@
 
 ### CI Workflow Diagram
 
+![Worflow Diagram](/images/Diagram.png)
+
+The diagram shows how website files move from my local repository to DockerHub using Git Action.
+
+To achieve this I make changes on my local machine and push them to the GitHub Repository. When I create and pysh a version tag, GitHub actions run the workflow to build and publish the Docker image. 
+
+This image is then stored on DockerHub where it can be pulled and ran in a container. 
 ## 1. Docker Website and Container
 
 ### Website Files
@@ -157,6 +164,13 @@ This screenshot shows that the updated versioning pushed to dockerhub successful
 
 This screenshot shows that after a successful commit the workflow action did not trigger due to the yaml file
 
+![Version Updates](/images/VersionUpdate.png)
+
+This screenshot shows the versioning update works and now displays v1 as well as v1.1
+
+![Rollback](/images/Rollback.png)
+
+This screenshot shows that the image can be pulled from a previous release version. v1.1 and v1.0 were both ran simultaneously on different ports so they could be compared side by side. Docker ps is included under the websites to show the semantic versioning of the images.
 ## References
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
