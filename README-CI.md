@@ -105,6 +105,12 @@ To start the semantic versioning, The GitHub action trigger was changed from pus
 
 The branch filter was replaced with v*.*.* so the workflow would run when i pushed version tags. This allows Docker images to be published when a versioned release was made instead of every update to the website. 
 
+### Creating Git Tags
+
+After the workflow was updated to allow semantic versioning, the changes were commited and pushed to the main branch. 
+
+An annotated Git tag was created named v1.0.0 using git tag -a command. This tag was used for the first full release of the website. The tag was pushed to GitHub using git push origin v1.0.0 which triggered the GitHub action workflow to build and publish the Docker Image. 
+
 ### Docker Image Version Tags
 
 The Docker metadata action to generate image tags based on semantic version was updated. This update would allow the image to have the latest, major version, and major.minor version tags.
@@ -152,3 +158,5 @@ A new container was started using the updated image and i opened the website in 
 - [Docker Metadata](https://github.com/docker/metadata-action) - Shows how metadata action generates tags. 
 
 - [Docker Tags](https://docs.docker.com/build/ci/github-actions/manage-tags-labels/) - action workflow for versioning explanations. and updates to the yaml to create versioning pushes 
+
+- [Git Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging) - how to annotate a tag and push to the repository
