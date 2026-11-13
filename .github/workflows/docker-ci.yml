@@ -2,8 +2,8 @@ name: Build and push Docker image
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
   pull_request:
 
 permissions:
@@ -19,6 +19,10 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/akuma-fitness
+          tags: |
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
 
       - name: Sign in to Docker Hub
         if: github.event_name != 'pull_request'

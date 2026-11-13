@@ -95,7 +95,25 @@ The docker/build-push-action@v7 action builds the image using the Dockerfile in 
 
 The push: true setting tells the action to upload the image to DockerHub after it has been built. The tags, labels, and annotations will then be supplied by the metadata action also configured in the workflow.
 
+### Part 2 Permalink: https://github.com/WSU-kduncan/ceg3120-cicd-ray163-f26/commit/683fcfe829641385764a90d274be5677599cd0bf
+
+This is the commit containing the original GitHub Action workflow that was configured to build and push Docker images when changes were pushed to the main branch. This is the commit for the workflow prior to the semantic versioning update. 
+
 ## 3. Semantic Versioning
+
+To start the semantic versioning, The GitHub action trigger was changed from pushes to main branch to pushes containing versioning tags. 
+
+The branch filter was replaced with v*.*.* so the workflow would run when i pushed version tags. This allows Docker images to be published when a versioned release was made instead of every update to the website. 
+
+### Docker Image Version Tags
+
+The Docker metadata action to generate image tags based on semantic version was updated. This update would allow the image to have the latest, major version, and major.minor version tags.
+
+The semver patters from [Dockers Manage Tags and Actions](https://docs.docker.com/build/ci/github-actions/manage-tags-labels/) page was utilized. The {{major}} tag generates the major version, while allowing {{major}}.{{minor}} generates the major and minor versions together. 
+
+The raw latest tag allows the newest release to be identified without specifying a version number. 
+
+So pushing Git tag v1.2.5 would create Docker image tags 1, 1.2.5 and latest. 
 
 ## 4. Testing and Proof
 
@@ -132,3 +150,5 @@ A new container was started using the updated image and i opened the website in 
 - [GitHub Workflow Syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax) - Shows how workflows are structured giving a better understanding of what the parts of the YAML were doing and why.
 
 - [Docker Metadata](https://github.com/docker/metadata-action) - Shows how metadata action generates tags. 
+
+- [Docker Tags](https://docs.docker.com/build/ci/github-actions/manage-tags-labels/) - action workflow for versioning explanations. and updates to the yaml to create versioning pushes 
