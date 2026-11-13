@@ -153,6 +153,10 @@ A new container was started using the updated image and i opened the website in 
 
 This screenshot shows that the updated versioning pushed to dockerhub successfully and generated all 3 expected tags.
 
+![Untagged commit](/images/untaggedcommit.png)
+
+This screenshot shows that after a successful commit the workflow action did not trigger due to the yaml file
+
 ## References
 
 - [Dockerhub httpd](https://hub.docker.com/_/httpd) - Docker website with instructions on how to use Apache.
