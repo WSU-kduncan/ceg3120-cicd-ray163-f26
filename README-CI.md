@@ -64,8 +64,6 @@ docker build -t kan0sh1/akuma-fitness:latest .
 
 The docker build command uses the Dockerfile to create the image. The -t option assigns a name and a tag to the image, and the . tells Docker to use the current directory for the build context.
 
-
-
 ### Running the Docker Container
 
 From the image I started a container to verify it was building and working correctly:
@@ -94,6 +92,22 @@ Dockerhub was checked to verify the image was uploaded successfully.
 [Akuma Fitness DockerHub Repository](https://hub.docker.com/r/kan0sh1/akuma-fitness)
 
 ## 2. Github Actions and Dockerhub
+
+### Creating a DockerHub PAT
+
+For GitHub Actions to publish a Docker image, a PAT is needed in DockerHub.
+
+To create the token:
+
+1. Sign into DockerHub and open the Account Settings.
+2. Select Personal Access Tokens.
+3. Select Generate New Token
+4. Give the token a meaningful name and select its permissions. 
+5. Generate the token and copy it into a secure location.
+
+The recommended permissions for this project were Read & Write. This allows the GitHub action to authenticate with DockerHub and push images while limiting other features.
+
+
 
 ### Github Repository Secrets
 
@@ -132,10 +146,57 @@ The docker/build-push-action@v7 action builds the image using the Dockerfile in 
 
 The push: true setting tells the action to upload the image to DockerHub after it has been built. The tags, labels, and annotations will then be supplied by the metadata action also configured in the workflow.
 
+### Reusing the Workflow
+
+To take this workflow and use on another project, some values need modified.
+
+GitHub Actions Workflow:
+
+The Images value in the docker/metadata-action would need to match the appropriate DockerHub username and image as opposed to, kan0sh1/akuma-fitness.
+
+The branch trigger should be updated for the desired image build if the user wanted a different trigger.
+
+GitHub Repository:
+
+The DOCKER_USERNAME secret would need to contain the appropriate DockerHub username.
+
+The DOCKER_TOKEN secret would need to contain the appropriate DockerHub PAT.
+
+The repository would need a Dockerfile and the website files in the correct location for their image to build.
+
 ### Part 2 Permalink: https://github.com/WSU-kduncan/ceg3120-cicd-ray163-f26/commit/683fcfe829641385764a90d274be5677599cd0bf
 
 This is the commit containing the original GitHub Action workflow that was configured to build and push Docker images when changes were pushed to the main branch. This is the commit for the workflow prior to the semantic versioning update. 
 
+### Testing the Workflow
+
+To test the GitHub Actions workflow, I made a small change to my website and committed it to the main branch.
+
+The changes were pushed using 
+
+```
+git push origin main
+```
+
+Opening the actions tab in GitHub repository after this found the workflow to be running. I waited for the workflow to finish and verified that it ran successfully. Checking DockerHub after found the image was published and updated.
+
+To test the Docker image locally you can pull it from DockerHub:
+
+```
+docker pull kan0sh1/akuma-fitness:main
+```
+
+I started the container using the downloaded image:
+
+```
+docker run -d --name akuma-updated -p 8081:80 kan0sh1/akuma-fitness:main
+```
+
+After starting the container you can call docker ps to verify the image is running and open http://localhost:8081 in the browser.
+
+The updated website displayed correctly, which confirmed the GitHub action built and published the changes successfully.
+
+I also tested a separate branch commit. Given the way the YAML was set up a push on any branch other than main should not have triggered a workflow. It did not which confirmed the workflow was restricted correctly. 
 ## 3. Semantic Versioning
 
 To start the semantic versioning, The GitHub action trigger was changed from pushes to main branch to pushes containing versioning tags. 
@@ -147,6 +208,34 @@ The branch filter was replaced with v*.*.* so the workflow would run when i push
 After the workflow was updated to allow semantic versioning, the changes were commited and pushed to the main branch. 
 
 An annotated Git tag was created named v1.0.0 using git tag -a command. This tag was used for the first full release of the website. The tag was pushed to GitHub using git push origin v1.0.0 which triggered the GitHub action workflow to build and publish the Docker Image. 
+
+### Git Tag Commands
+
+Git tags were used to identify specific releases of the website. I used annotated tags to mark the versions that would trigger GitHub Actions.
+
+To view existing tags in the repository:
+
+```
+git tag -l
+```
+
+To create a versioned tag:
+
+```
+git tag -a v1.0.0 -m "Full Version Release"
+```
+
+The -a option creates an annotated tag, while -m provides a message describing the release.
+
+To push the tag to GitHub:
+
+```
+git push origin v1.0.0
+```
+
+This process is easily mimicked for further versioned updates. Simply change the version tag and push the new tag to GitHub. 
+
+In doing this variation the website versions are all accessibly from DockerHub under the appropriate version tags.
 
 ### Docker Image Version Tags
 
@@ -161,6 +250,43 @@ So, for example, pushing Git tag v1.2.5 would create Docker image tags 1, 1.2 an
 ### Docker Image Tags
 
 After pushing the v1.0.0 Git tag, the git action workflow should trigger. Checking the DockerHub repository verified that the workflow successfully published the image with latest, 1, and 1.0 tags. 
+
+### Semantic Versioning Configuration
+
+The GitHubn actions workflow was updated to publish Docker images when a version tag matching the v*.*.* was pushed instead of on every commit to main.
+
+The workflow used these steps:
+
+1. docker/metadata-action: Generates Docker image tags based on the Git version tag. The configured patterns produce the major version, major.minor version, and the latest tags.
+2. docker/login-actions: Authenticates with DockerHub using the DOCKER_USERNAME and DOCKER_TOKEN repository secret. 
+3. docker/setup-buildx-action: Prepares Docker Buildx to build the container image.
+4. docker/build-push-action: Builds the image using the Dockerfile and publishes it to the DockerHub with the generated tags.
+
+### Testing and Validating Semantics
+
+To test the updated workflow, I pushed the annotated Git tag v1.0.0 to GitHub. I opened the GitHub Actions tab and verified the workflows ran and completed successfully. 
+
+Checking DockerHub repository found the image was published with the latest, 1, and 1.0 tags. 
+
+After making a change to the website, in the way of background color, I created and pushed the v1.1.0 tag. This triggered another successful workflow and updated the latest tag. The previous 1.0 image remained visible on the DockerHub site as well.
+
+To verify the images worked, I pulled both versions:
+
+```
+docker pull kan0sh1/akuma-fitness:1.0
+docker pull kan0sh1/akuma-fitness:1.1
+```
+
+Both versions were ran on separate ports:
+
+```
+docker run -d --name akuma- -p 8082:80 kan0sh1/akuma-fitness:1.0
+docker run -d --name akuma-11 -p 8083:80 kan0sh1/akuma-fitness:1.1
+```
+
+Docker ps was ran to confirm both containers were running and opened localhost:8082 and localhost:8083 in the browser.
+
+Both versions displayed their website content with changes. This confirmed that the newer image was published correctly and the older releases could still be used for rollback.
 
 ## 4. Testing and Proof
 
@@ -217,3 +343,5 @@ This screenshot shows that the image can be pulled from a previous release versi
 - [Docker Tags](https://docs.docker.com/build/ci/github-actions/manage-tags-labels/) - action workflow for versioning explanations. and updates to the yaml to create versioning pushes 
 
 - [Git Tagging](https://git-scm.com/book/en/v2/Git-Basics-Tagging) - how to annotate a tag and push to the repository
+
+- [ChatGPT]()
