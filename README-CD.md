@@ -40,6 +40,42 @@ Port 80 allows the website to be accessed publicly.
 
 Port 9000 is reserved for webhook testing as defined by the project.
 
+### Docker Installation and Website Deployment
+
+After the EC2 instance is set up, I connected to the server using SSH and installed Docker using the Ubuntu Package manager.
+
+```bash
+sudo apt update
+sudo apt insall -y docker.io
+sudo systemctl enable --now docker
+```
+The --now flag configures Docker to start automatically at boot and starts Docker immediately. This flag prevents needing the two commands utilized in my previous projects. 
+
+I then added Ubuntu to the Docker group so Docker commands can be ran without the need of sudo.
+
+```bash
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+
+This command was verified by using the commands docker --version and docker ps. Both commands loaded without requiring sudo.
+
+### Pulling and Running the Website
+
+I pulled my Akuma Fitness Image from DockerHub using:
+
+`docker pull kan0sh1/akuma-fitness:latest`
+
+I started the website container with:
+
+`docker run -d --name akuma-fitness --restart always -p 80:80 kan0sh1/akuma-fitness:latest`
+
+- `-d` tells the container to run in the background. Since this container is designed to host a website, detached mode is the best option as opposed to an interactive terminal session(`-it`).
+
+- `--restart always` tells Docker to automatically restart the container if it stops or when Docker restarts. Port 80 from the EC2 instance is mapped to port 80 inside the container so visitors can access the Apache web server.
+
+I verified it was running with `docker ps` which showed the container running. Opening the EIP `184.198.77.240` in my browser found the website loaded successfully, meaning all aspects of the container and security group applicable to this point were working as intended.
+
 ## Part 2 - Webhook Listener
 
 ## Part 3 - GitHub Webhook
@@ -50,4 +86,17 @@ Port 9000 is reserved for webhook testing as defined by the project.
 
 This screenshot shows the instance built and running, as well as, the inbound security group rules created for this instance.
 
+![Website Running](images/InitialWebsiteConfirmation.png)
+
+This screenshot shows the website running via the docker image at the EIP assigned to the EC2 instance.
+
+![Docker without Sudo](images/DockerWithoutSudo.png)
+
+This screenshot shows the docker version and docker container running without the use of Sudo
+
+
 ## References
+
+- [Systemctl Documentation](https://www.freedesktop.org/software/systemd/man/latest/systemctl.html) - Provides a great overview of systemctl, this was used specifically to see the flag, --now, that combines systemctl enable and systemctl start.
+
+- [Docker without Sudo](https://docs.docker.com/engine/install/linux-postinstall) - Adding user to the Docker group so commands can run without sudo.
