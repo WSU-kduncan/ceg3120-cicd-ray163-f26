@@ -49,7 +49,7 @@ sudo apt update
 sudo apt insall -y docker.io
 sudo systemctl enable --now docker
 ```
-The --now flag configures Docker to start automatically at boot and starts Docker immediately. This flag prevents needing the two commands utilized in my previous projects. 
+The `--now flag` configures Docker to start automatically at boot and starts Docker immediately. This flag prevents needing the two commands utilized in my previous projects. 
 
 I then added Ubuntu to the Docker group so Docker commands can be ran without the need of sudo.
 
@@ -58,7 +58,7 @@ sudo usermod -aG docker ubuntu
 newgrp docker
 ```
 
-This command was verified by using the commands docker --version and docker ps. Both commands loaded without requiring sudo.
+This command was verified by using the commands `docker --version` and `docker ps`. Both commands loaded without requiring sudo.
 
 ### Pulling and Running the Website
 
@@ -82,21 +82,29 @@ A script called deployment/refresh.sh was created and placed in the deployment f
 
 The script stops and removes the existing akuma-fitness container. It then pulls the latest image from DockerHub and starts a new container.
 
-The set -e flag was used so the script will stop if a command fails. The replacment container uses --restart always so Docker will automatically restart when needed. 
+The `set -e` flag was used so the script will stop if a command fails. The replacment container uses --restart always so Docker will automatically restart when needed. 
 
 ### Testing the Refresh Script
 
-The script was created in VS Code and trasnferred to EC2 instance using scp. After making the script executable, chmod +x, it was tested manually. 
+The script was created in VS Code and trasnferred to EC2 instance using scp. After making the script executable, `chmod +x`, it was tested manually. 
 
 Using docker ps I was able to see the existing container ID. 
 
-Run the script with ./refresh.sh
+Run the script with `./refresh.sh`
 
-After running the script I ran docker ps again to see and compare the container ID. Comparing the two found it had changed, which confirms the old container was removed and new one was created. 
+After running the script I ran `docker ps` again to see and compare the container ID. Comparing the two found it had changed, which confirms the old container was removed and new one was created. 
 
 I then verified that the Akuma Fitness website was still available. http://184.198.77.240 in the broweser.
 
 This verified the script could replace the container succesfully. 
+
+### Testing the Restart Policy
+
+The website container was configured with `--restart always` option so that Dcker would automatically restart when the EC2 instance was rebooted. 
+
+This was an easy test, using `sudo reboot`, I waited for the instance to restart. After which time, I was able to reconnect through SSH and verify the container was running using `docker ps`.
+
+With the container still running after the reboot, I also confirmed the site was still loading in the browser.
 
 ## Part 2 - Webhook Listener
 
@@ -119,6 +127,10 @@ This screenshot shows the docker version and docker container running without th
 ![Refresh Script](images/RefreshScript.png)
 
 This screenshot shows the container ID changing after succesful run of the refresh script.
+
+![Restart In Action](images/DockerRestart.png)
+
+Screenshot showing the docker container restart policy works as intended.
 
 
 ## References
