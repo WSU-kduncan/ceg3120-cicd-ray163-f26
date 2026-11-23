@@ -76,6 +76,28 @@ I started the website container with:
 
 I verified it was running with `docker ps` which showed the container running. Opening the EIP `184.198.77.240` in my browser found the website loaded successfully, meaning all aspects of the container and security group applicable to this point were working as intended.
 
+### Docker Refresh Script
+
+A script called deployment/refresh.sh was created and placed in the deployment folder. This script updates the website container when a newer Docker image is available. 
+
+The script stops and removes the existing akuma-fitness container. It then pulls the latest image from DockerHub and starts a new container.
+
+The set -e flag was used so the script will stop if a command fails. The replacment container uses --restart always so Docker will automatically restart when needed. 
+
+### Testing the Refresh Script
+
+The script was created in VS Code and trasnferred to EC2 instance using scp. After making the script executable, chmod +x, it was tested manually. 
+
+Using docker ps I was able to see the existing container ID. 
+
+Run the script with ./refresh.sh
+
+After running the script I ran docker ps again to see and compare the container ID. Comparing the two found it had changed, which confirms the old container was removed and new one was created. 
+
+I then verified that the Akuma Fitness website was still available. http://184.198.77.240 in the broweser.
+
+This verified the script could replace the container succesfully. 
+
 ## Part 2 - Webhook Listener
 
 ## Part 3 - GitHub Webhook
@@ -93,6 +115,10 @@ This screenshot shows the website running via the docker image at the EIP assign
 ![Docker without Sudo](images/DockerWithoutSudo.png)
 
 This screenshot shows the docker version and docker container running without the use of Sudo
+
+![Refresh Script](images/RefreshScript.png)
+
+This screenshot shows the container ID changing after succesful run of the refresh script.
 
 
 ## References
